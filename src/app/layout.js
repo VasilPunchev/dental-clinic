@@ -31,12 +31,12 @@ export const metadata = {
   authors: [{ name: "Д-р Копринка Чорбаджиева" }],
   creator: "Д-р Копринка Чорбаджиева",
   publisher: "Д-р Копринка Чорбаджиева",
-  metadataBase: new URL("https://example.com"),
+  metadataBase: new URL("https://dental-clinic-xi-ten.vercel.app"),
   openGraph: {
     title: "Д-р Копринка Чорбаджиева | Дентален кабинет в Пловдив",
     description:
       "Профилактика, лечение, бондинг, алайнери и естетична стоматология в Пловдив. Онлайн заявка за час.",
-    url: "https://example.com",
+    url: "https://dental-clinic-xi-ten.vercel.app",
     siteName: "Д-р Копринка Чорбаджиева",
     locale: "bg_BG",
     type: "website",
