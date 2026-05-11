@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import StatusFilter from "./StatusFilter";
 
 import LogoutButton from "./LogoutButton";
 import AppointmentActions from "./AppointmentActions";
@@ -11,18 +12,26 @@ const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseSecretKey);
 
-export default async function AdminPage() {
+export default async function AdminPage({ searchParams }) {
     const cookieStore = await cookies();
     const isAdmin = cookieStore.get("admin-auth")?.value === "true";
 
     if (!isAdmin) {
         redirect("/admin/login");
     }
+    const resolvedSearchParams = await searchParams;
+    const activeStatus = resolvedSearchParams?.status || "all";
 
-    const { data: appointments, error } = await supabase
+    let appointmentsQuery = supabase
         .from("appointments")
         .select("*")
         .order("created_at", { ascending: false });
+
+    if (activeStatus !== "all") {
+        appointmentsQuery = appointmentsQuery.eq("status", activeStatus);
+    }
+
+    const { data: appointments, error } = await appointmentsQuery;
 
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -49,6 +58,7 @@ export default async function AdminPage() {
             </header>
 
             <section className="mx-auto max-w-6xl px-6 py-10">
+                <StatusFilter activeStatus={activeStatus} />
                 {error && (
                     <div className="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700">
                         Възникна грешка при зареждане на заявките.

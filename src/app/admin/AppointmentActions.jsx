@@ -36,11 +36,20 @@ export default function AppointmentActions({ appointment }) {
     .replace(/\D/g, "")
     .replace(/^0/, "")}`;
 
-  const whatsappMessage = `Здравейте, ${appointment.name}! Получихме вашата заявка за час за ${appointment.service} на ${appointment.preferred_date} в ${appointment.preferred_hour}. Моля, потвърдете дали часът е удобен за Вас.`;
+  const confirmationMessage = `Здравейте, ${appointment.name}! Получихме вашата заявка за час за ${appointment.service} на ${appointment.preferred_date} в ${appointment.preferred_hour}. Моля, потвърдете дали часът е удобен за Вас.`;
 
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    whatsappMessage
+    confirmationMessage
   )}`;
+
+  const viberUrl = `viber://chat?number=%2B${phoneNumber}`;
+  if (appointment.status === "cancelled") {
+    return (
+      <span className="text-xs font-medium text-slate-400">
+        Няма активни действия
+      </span>
+    );
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -69,6 +78,12 @@ export default function AppointmentActions({ appointment }) {
         className="rounded-full bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
       >
         WhatsApp
+      </a>
+      <a
+        href={viberUrl}
+        className="rounded-full bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700 transition hover:bg-purple-100"
+      >
+        Viber
       </a>
     </div>
   );
