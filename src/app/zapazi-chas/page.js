@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const services = [
@@ -24,12 +24,54 @@ export default function AppointmentPage() {
         preferredHour: "",
         message: "",
     });
+    const [availableHours, setAvailableHours] = useState([]);
+    const [isLoadingHours, setIsLoadingHours] = useState(false);
 
     const [status, setStatus] = useState("");
     const [statusType, setStatusType] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    useEffect(() => {
+        if (!form.preferredDate) {
+            setAvailableHours([]);
+            return;
+        }
 
+        async function loadAvailableHours() {
+            setIsLoadingHours(true);
+
+            try {
+                const response = await fetch(
+                    `/api/available-hours?date=${form.preferredDate}`
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    setAvailableHours([]);
+                    return;
+                }
+
+                setAvailableHours(result.availableHours || []);
+
+                if (
+                    form.preferredHour &&
+                    !result.availableHours?.includes(form.preferredHour)
+                ) {
+                    setForm((current) => ({
+                        ...current,
+                        preferredHour: "",
+                    }));
+                }
+            } catch (error) {
+                setAvailableHours([]);
+            } finally {
+                setIsLoadingHours(false);
+            }
+        }
+
+        loadAvailableHours();
+    }, [form.preferredDate, form.preferredHour]);
 
     function handleChange(e) {
         setForm({
@@ -289,18 +331,22 @@ export default function AppointmentPage() {
                                     value={form.preferredHour}
                                     onChange={handleChange}
                                     required
-                                    className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                                    disabled={isLoadingHours || availableHours.length === 0}
+                                    className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                                 >
-                                    <option value="">Изберете час</option>
-                                    <option value="09:00">09:00</option>
-                                    <option value="10:00">10:00</option>
-                                    <option value="11:00">11:00</option>
-                                    <option value="12:00">12:00</option>
-                                    <option value="13:00">13:00</option>
-                                    <option value="14:00">14:00</option>
-                                    <option value="15:00">15:00</option>
-                                    <option value="16:00">16:00</option>
-                                    <option value="17:00">17:00</option>
+                                    <option value="">
+                                        {isLoadingHours
+                                            ? "Зареждане на свободни часове..."
+                                            : availableHours.length === 0
+                                                ? "Няма свободни часове"
+                                                : "Изберете час"}
+                                    </option>
+
+                                    {availableHours.map((hour) => (
+                                        <option key={hour} value={hour}>
+                                            {hour}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>

@@ -1,19 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const hours = [
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-];
 
 export default function ManualAppointmentForm() {
     const router = useRouter();
@@ -26,7 +15,51 @@ export default function ManualAppointmentForm() {
         note: "",
     });
 
+    const [availableHours, setAvailableHours] = useState([]);
+    const [isLoadingHours, setIsLoadingHours] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (!formData.appointmentDate) {
+            setAvailableHours([]);
+            return;
+        }
+
+        async function loadAvailableHours() {
+            setIsLoadingHours(true);
+
+            try {
+                const response = await fetch(
+                    `/api/available-hours?date=${formData.appointmentDate}`
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    setAvailableHours([]);
+                    return;
+                }
+
+                setAvailableHours(result.availableHours || []);
+
+                if (
+                    formData.appointmentHour &&
+                    !result.availableHours?.includes(formData.appointmentHour)
+                ) {
+                    setFormData((current) => ({
+                        ...current,
+                        appointmentHour: "",
+                    }));
+                }
+            } catch (error) {
+                setAvailableHours([]);
+            } finally {
+                setIsLoadingHours(false);
+            }
+        }
+
+        loadAvailableHours();
+    }, [formData.appointmentDate, formData.appointmentHour]);
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -108,10 +141,18 @@ export default function ManualAppointmentForm() {
                         value={formData.appointmentHour}
                         onChange={handleChange}
                         required
-                        className="rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 outline-none transition focus:border-sky-400"
+                        disabled={isLoadingHours || availableHours.length === 0}
+                        className="rounded-2xl border border-slate-200 px-3 py-2.5 text-slate-900 outline-none transition focus:border-sky-400 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                     >
-                        <option value="">Изберете час</option>
-                        {hours.map((hour) => (
+                        <option value="">
+                            {isLoadingHours
+                                ? "Зареждане на свободни часове..."
+                                : availableHours.length === 0
+                                    ? "Няма свободни часове"
+                                    : "Изберете час"}
+                        </option>
+
+                        {availableHours.map((hour) => (
                             <option key={hour} value={hour}>
                                 {hour}
                             </option>
