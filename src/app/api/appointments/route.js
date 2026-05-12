@@ -53,7 +53,53 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+    const { data: confirmedAppointment, error: confirmedCheckError } =
+      await supabase
+        .from("appointments")
+        .select("id")
+        .eq("preferred_date", preferredDate)
+        .eq("preferred_hour", preferredHour)
+        .eq("status", "confirmed")
+        .maybeSingle();
 
+    if (confirmedCheckError) {
+      console.error("Confirmed appointment check error:", confirmedCheckError);
+
+      return Response.json(
+        { error: "Неуспешна проверка на свободния час." },
+        { status: 500 }
+      );
+    }
+
+    if (confirmedAppointment) {
+      return Response.json(
+        { error: "Този час вече е зает. Моля, изберете друг час." },
+        { status: 409 }
+      );
+    }
+
+    const { data: manualAppointment, error: manualCheckError } = await supabase
+      .from("manual_appointments")
+      .select("id")
+      .eq("appointment_date", preferredDate)
+      .eq("appointment_hour", preferredHour)
+      .maybeSingle();
+
+    if (manualCheckError) {
+      console.error("Manual appointment check error:", manualCheckError);
+
+      return Response.json(
+        { error: "Неуспешна проверка на свободния час." },
+        { status: 500 }
+      );
+    }
+
+    if (manualAppointment) {
+      return Response.json(
+        { error: "Този час вече е зает. Моля, изберете друг час." },
+        { status: 409 }
+      );
+    }
     const appointment = {
       name: name.trim(),
       phone: phone.trim(),

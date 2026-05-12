@@ -22,7 +22,30 @@ export async function POST(request) {
         { status: 400 }
       );
     }
+    const { data: confirmedAppointment, error: confirmedCheckError } =
+      await supabase
+        .from("appointments")
+        .select("id")
+        .eq("preferred_date", appointmentDate)
+        .eq("preferred_hour", appointmentHour)
+        .eq("status", "confirmed")
+        .maybeSingle();
 
+    if (confirmedCheckError) {
+      console.error("Confirmed appointment check error:", confirmedCheckError);
+
+      return NextResponse.json(
+        { error: "Неуспешна проверка на свободния час." },
+        { status: 500 }
+      );
+    }
+
+    if (confirmedAppointment) {
+      return NextResponse.json(
+        { error: "Този час вече е потвърден от заявка в сайта." },
+        { status: 409 }
+      );
+    }
     const { error } = await supabase.from("manual_appointments").insert({
       appointment_date: appointmentDate,
       appointment_hour: appointmentHour,
