@@ -6,6 +6,8 @@ import StatusFilter from "./StatusFilter";
 
 import LogoutButton from "./LogoutButton";
 import AppointmentActions from "./AppointmentActions";
+import ManualAppointmentForm from "./ManualAppointmentForm.jsx";
+import SchedulePanel from "./SchedulePanel";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
@@ -32,6 +34,22 @@ export default async function AdminPage({ searchParams }) {
     }
 
     const { data: appointments, error } = await appointmentsQuery;
+    const today = new Date().toISOString().split("T")[0];
+
+    const { data: manualAppointments = [], error: manualAppointmentsError } =
+        await supabase
+            .from("manual_appointments")
+            .select("*")
+            .eq("appointment_date", today)
+            .order("appointment_hour", { ascending: true });
+
+    const { data: confirmedAppointments = [], error: confirmedAppointmentsError } =
+        await supabase
+            .from("appointments")
+            .select("*")
+            .eq("preferred_date", today)
+            .eq("status", "confirmed")
+            .order("preferred_hour", { ascending: true });
 
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -44,10 +62,23 @@ export default async function AdminPage({ searchParams }) {
                         </h1>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                        <Link
+                            href="/admin/grafik"
+                            className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
+                        >
+                            График
+                        </Link>
+
+                        <Link
+                            href="/admin/dobavi-chas"
+                            className="rounded-full bg-sky-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-600/20 transition hover:bg-sky-700"
+                        >
+                            Добави час
+                        </Link>
                         <Link
                             href="/"
-                            className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
+                            className="rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-600/20 transition hover:bg-sky-700"
                         >
                             Към сайта
                         </Link>
@@ -58,6 +89,7 @@ export default async function AdminPage({ searchParams }) {
             </header>
 
             <section className="mx-auto max-w-6xl px-6 py-10">
+
                 <StatusFilter activeStatus={activeStatus} />
                 {error && (
                     <div className="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700">
@@ -83,6 +115,7 @@ export default async function AdminPage({ searchParams }) {
                                 <thead className="bg-slate-100 text-slate-600">
                                     <tr>
                                         <th className="px-5 py-4 font-semibold">Пациент</th>
+                                        <th className="px-5 py-4 text-left">Бележка</th>
                                         <th className="px-5 py-4 font-semibold">Телефон</th>
                                         <th className="px-5 py-4 font-semibold">Услуга</th>
                                         <th className="px-5 py-4 font-semibold">Дата</th>
@@ -90,6 +123,7 @@ export default async function AdminPage({ searchParams }) {
                                         <th className="px-5 py-4 font-semibold">Статус</th>
                                         <th className="px-5 py-4 font-semibold">Създадена</th>
                                         <th className="px-5 py-4 font-semibold">Действия</th>
+
                                     </tr>
                                 </thead>
 
@@ -101,11 +135,10 @@ export default async function AdminPage({ searchParams }) {
                                         >
                                             <td className="px-5 py-4 font-medium text-slate-950">
                                                 {appointment.name}
-                                                {appointment.message && (
-                                                    <p className="mt-1 max-w-xs text-xs font-normal text-slate-500">
-                                                        {appointment.message}
-                                                    </p>
-                                                )}
+                                            </td>
+
+                                            <td className="max-w-[220px] px-5 py-4 text-xs leading-5 text-slate-500">
+                                                {appointment.message || "—"}
                                             </td>
 
                                             <td className="px-5 py-4 text-slate-600">
