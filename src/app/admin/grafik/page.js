@@ -6,6 +6,7 @@ import Link from "next/link";
 import LogoutButton from "../LogoutButton";
 import SchedulePanel from "../SchedulePanel";
 import ScheduleDatePicker from "../ScheduleDatePicker";
+import { isPastDate } from "@/lib/workingHours";
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SECRET_KEY
@@ -22,6 +23,7 @@ export default async function AdminSchedulePage({ searchParams }) {
   const today = new Date().toISOString().split("T")[0];
   const resolvedSearchParams = await searchParams;
   const selectedDate = resolvedSearchParams?.date || today;
+  const pastDateReason = isPastDate(selectedDate) ? "Изминала дата" : null;
   const { data: unavailableDay } = await supabase
     .from("unavailable_days")
     .select("id, reason")
@@ -92,7 +94,7 @@ export default async function AdminSchedulePage({ searchParams }) {
           selectedDate={selectedDate}
           confirmedAppointments={confirmedAppointments}
           manualAppointments={manualAppointments}
-          unavailableReason={unavailableDay?.reason}
+          unavailableReason={pastDateReason || unavailableDay?.reason}
         />
       </section>
     </main>

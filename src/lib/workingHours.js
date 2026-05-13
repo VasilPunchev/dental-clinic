@@ -13,3 +13,8 @@ export function getWorkingHoursForDate(date) {
 
   return workingHoursByDay[day] || [];
 }
+export function isPastDate(date) {
+  const today = new Date().toISOString().split("T")[0];
+
+  return date < today;
+}

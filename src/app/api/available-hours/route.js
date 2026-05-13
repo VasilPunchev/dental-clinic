@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getWorkingHoursForDate } from "@/lib/workingHours";
+import { getWorkingHoursForDate, isPastDate } from "@/lib/workingHours";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -19,6 +19,13 @@ export async function GET(request) {
         { error: "Липсва дата." },
         { status: 400 }
       );
+    }
+    if (isPastDate(date)) {
+      return NextResponse.json({
+        date,
+        availableHours: [],
+        unavailableReason: "Изминала дата",
+      });
     }
     const workingHours = getWorkingHoursForDate(date);
     const { data: unavailableDay, error: unavailableDayError } = await supabase
