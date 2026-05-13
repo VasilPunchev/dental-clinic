@@ -97,7 +97,7 @@ export default function SchedulePanel({
             )}
         </div>
       )}
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-2">
         {hours.map((hour) => {
           const confirmedAppointment = getConfirmedAppointment(hour);
           const manualAppointment = getManualAppointment(hour);
@@ -116,12 +116,12 @@ export default function SchedulePanel({
                     <p className="mt-1 text-sm text-slate-700">
                       {confirmedAppointment.name}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 line-clamp-2 break-words text-xs leading-5 text-slate-500">
                       {confirmedAppointment.service}
                     </p>
                   </div>
 
-                  <div className="sm:text-right">
+                  <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
                     <p className="text-sm font-semibold text-sky-700">
                       {confirmedAppointment.phone}
                     </p>
@@ -152,13 +152,13 @@ export default function SchedulePanel({
                       {manualAppointment.name}
                     </p>
                     {manualAppointment.note && (
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="mt-1 line-clamp-2 break-all text-xs leading-5 text-slate-500">
                         {manualAppointment.note}
                       </p>
                     )}
                   </div>
 
-                  <div className="sm:text-right">
+                  <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
                     {manualAppointment.phone && (
                       <p className="text-sm font-semibold text-orange-700">
                         {manualAppointment.phone}

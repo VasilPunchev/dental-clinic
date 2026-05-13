@@ -16,7 +16,7 @@ export default function ReminderActions({ name, phone, hour }) {
   const viberUrl = `viber://chat?number=%2B${phoneNumber}`;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 sm:justify-end">
       <a
         href={whatsappUrl}
         target="_blank"
