@@ -37,10 +37,63 @@ export default function SchedulePanel({
         </p>
       </div>
       {hours.length === 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-600">
-          {unavailableReason
-            ? `${unavailableReason} — няма свободни часове.`
-            : "Неработен ден — няма свободни часове."}
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-600">
+            {unavailableReason
+              ? `${unavailableReason} — няма свободни часове.`
+              : "Неработен ден — няма свободни часове."}
+          </div>
+
+          {unavailableReason &&
+            (confirmedAppointments.length > 0 || manualAppointments.length > 0) && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <p className="font-bold text-amber-800">
+                  Има записани часове в този почивен период
+                </p>
+
+                <p className="mt-2 text-sm leading-6 text-amber-700">
+                  Тези часове са били добавени преди денят да бъде отбелязан като
+                  почивен. Проверете ги и се свържете с пациентите при нужда.
+                </p>
+
+                <div className="mt-4 grid gap-3">
+                  {confirmedAppointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="rounded-xl bg-white p-4 text-sm shadow-sm"
+                    >
+                      <p className="font-bold text-slate-950">
+                        {appointment.preferred_hour} — {appointment.name}
+                      </p>
+                      <p className="mt-1 text-slate-600">
+                        Потвърден от сайта · {appointment.service}
+                      </p>
+                      <p className="mt-1 text-slate-500">{appointment.phone}</p>
+                    </div>
+                  ))}
+
+                  {manualAppointments.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      className="rounded-xl bg-white p-4 text-sm shadow-sm"
+                    >
+                      <p className="font-bold text-slate-950">
+                        {appointment.appointment_hour} — {appointment.name}
+                      </p>
+                      <p className="mt-1 text-slate-600">Записан по телефон</p>
+                      {appointment.phone && (
+                        <p className="mt-1 text-slate-500">{appointment.phone}</p>
+                      )}
+                      {appointment.note && (
+                        <p className="mt-1 text-xs text-slate-500">
+                          {appointment.note}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       )}
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
