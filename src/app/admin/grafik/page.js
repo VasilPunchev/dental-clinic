@@ -22,6 +22,12 @@ export default async function AdminSchedulePage({ searchParams }) {
   const today = new Date().toISOString().split("T")[0];
   const resolvedSearchParams = await searchParams;
   const selectedDate = resolvedSearchParams?.date || today;
+  const { data: unavailableDay } = await supabase
+    .from("unavailable_days")
+    .select("id, reason")
+    .lte("start_date", selectedDate)
+    .gte("end_date", selectedDate)
+    .maybeSingle();
 
   const { data: manualAppointments = [] } = await supabase
     .from("manual_appointments")
@@ -86,6 +92,7 @@ export default async function AdminSchedulePage({ searchParams }) {
           selectedDate={selectedDate}
           confirmedAppointments={confirmedAppointments}
           manualAppointments={manualAppointments}
+          unavailableReason={unavailableDay?.reason}
         />
       </section>
     </main>

@@ -4,8 +4,10 @@ export default function SchedulePanel({
   selectedDate,
   confirmedAppointments,
   manualAppointments,
+  unavailableReason,
 }) {
-  const hours = getWorkingHoursForDate(selectedDate);
+  const workingHours = getWorkingHoursForDate(selectedDate);
+  const hours = unavailableReason ? [] : workingHours;
   function getConfirmedAppointment(hour) {
     return confirmedAppointments.find(
       (appointment) => appointment.preferred_hour === hour
@@ -36,7 +38,9 @@ export default function SchedulePanel({
       </div>
       {hours.length === 0 && (
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-600">
-          Неработен ден — няма свободни часове.
+          {unavailableReason
+            ? `${unavailableReason} — няма свободни часове.`
+            : "Неработен ден — няма свободни часове."}
         </div>
       )}
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
