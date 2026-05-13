@@ -1,4 +1,5 @@
 import { getWorkingHoursForDate } from "@/lib/workingHours";
+import ReminderActions from "./ReminderActions";
 
 export default function SchedulePanel({
   selectedDate,
@@ -120,9 +121,17 @@ export default function SchedulePanel({
                     </p>
                   </div>
 
-                  <p className="text-sm font-semibold text-sky-700">
-                    {confirmedAppointment.phone}
-                  </p>
+                  <div className="sm:text-right">
+                    <p className="text-sm font-semibold text-sky-700">
+                      {confirmedAppointment.phone}
+                    </p>
+
+                    <ReminderActions
+                      name={confirmedAppointment.name}
+                      phone={confirmedAppointment.phone}
+                      hour={hour}
+                    />
+                  </div>
                 </div>
               </div>
             );
@@ -149,11 +158,19 @@ export default function SchedulePanel({
                     )}
                   </div>
 
-                  {manualAppointment.phone && (
-                    <p className="text-sm font-semibold text-orange-700">
-                      {manualAppointment.phone}
-                    </p>
-                  )}
+                  <div className="sm:text-right">
+                    {manualAppointment.phone && (
+                      <p className="text-sm font-semibold text-orange-700">
+                        {manualAppointment.phone}
+                      </p>
+                    )}
+
+                    <ReminderActions
+                      name={manualAppointment.name}
+                      phone={manualAppointment.phone}
+                      hour={hour}
+                    />
+                  </div>
                 </div>
               </div>
             );
