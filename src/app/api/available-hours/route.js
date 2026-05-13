@@ -21,6 +21,27 @@ export async function GET(request) {
       );
     }
     const workingHours = getWorkingHoursForDate(date);
+    const { data: unavailableDay, error: unavailableDayError } = await supabase
+      .from("unavailable_days")
+      .select("id, reason")
+      .lte("start_date", date)
+      .gte("end_date", date)
+      .maybeSingle();
+
+    if (unavailableDayError) {
+      return NextResponse.json(
+        { error: "Грешка при проверка на почивни дни." },
+        { status: 500 }
+      );
+    }
+
+    if (unavailableDay) {
+      return NextResponse.json({
+        date,
+        availableHours: [],
+        unavailableReason: unavailableDay.reason || "Почивен ден",
+      });
+    }
 
     const { data: confirmedAppointments = [], error: confirmedError } =
       await supabase

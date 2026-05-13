@@ -38,7 +38,12 @@ export default async function AddManualAppointmentPage() {
             >
               График
             </Link>
-
+            <Link
+              href="/admin/pochivni-dni"
+              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
+            >
+              Почивни дни
+            </Link>
             <Link
               href="/"
               className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
