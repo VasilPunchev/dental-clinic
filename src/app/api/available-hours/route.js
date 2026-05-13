@@ -1,22 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getWorkingHoursForDate } from "@/lib/workingHours";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SECRET_KEY
 );
 
-const workingHours = [
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-];
+
 
 export async function GET(request) {
   try {
@@ -29,6 +20,7 @@ export async function GET(request) {
         { status: 400 }
       );
     }
+    const workingHours = getWorkingHoursForDate(date);
 
     const { data: confirmedAppointments = [], error: confirmedError } =
       await supabase

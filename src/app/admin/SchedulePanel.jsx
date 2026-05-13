@@ -1,20 +1,11 @@
-const hours = [
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "13:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-];
+import { getWorkingHoursForDate } from "@/lib/workingHours";
 
 export default function SchedulePanel({
   selectedDate,
   confirmedAppointments,
   manualAppointments,
 }) {
+  const hours = getWorkingHoursForDate(selectedDate);
   function getConfirmedAppointment(hour) {
     return confirmedAppointments.find(
       (appointment) => appointment.preferred_hour === hour
@@ -43,7 +34,11 @@ export default function SchedulePanel({
           показват тук.
         </p>
       </div>
-
+      {hours.length === 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-600">
+          Неработен ден — няма свободни часове.
+        </div>
+      )}
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {hours.map((hour) => {
           const confirmedAppointment = getConfirmedAppointment(hour);
